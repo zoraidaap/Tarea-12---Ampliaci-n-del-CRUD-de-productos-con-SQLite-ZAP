@@ -1,0 +1,132 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>CRUD SQLite</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- Formulario de Registro / Edición -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        {{ id === null ? 'Nuevo producto' : 'Editar producto' }}
+      </ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <form (ngSubmit)="guardar()">
+
+        <ion-input
+          label="Nombre"
+          name="nombre"
+          [(ngModel)]="nombre"
+          placeholder="Nombre del producto">
+        </ion-input>
+
+        <ion-input
+          label="Descripción"
+          label-placement="stacked"
+          name="descripcion"
+          [(ngModel)]="descripcion">
+        </ion-input>
+
+        <ion-input
+          label="Precio"
+          label-placement="stacked"
+          name="precio"
+          type="number"
+          min="0"
+          [(ngModel)]="precio"
+          required>
+        </ion-input>
+
+        <ion-input
+          label="Stock"
+          label-placement="stacked"
+          name="stock"
+          type="number"
+          min="0"
+          step="1"
+          [(ngModel)]="stock"
+          required>
+        </ion-input>
+
+        <ion-button
+          expand="block"
+          type="submit"
+          [disabled]="guardando">
+          {{ id === null ? 'Guardar producto' : 'Actualizar producto' }}
+        </ion-button>
+
+        @if (id !== null) {
+          <ion-button
+            expand="block"
+            fill="outline"
+            color="medium"
+            type="button"
+            (click)="limpiarFormulario()">
+            Cancelar edición
+          </ion-button>
+        }
+      </form>
+    </ion-card-content>
+  </ion-card>
+
+  @if (error) {
+    <ion-text color="danger">
+      <p>{{ error }}</p>
+    </ion-text>
+  }
+
+  <!-- Selector para ordenar alfabéticamente (A-Z / Z-A) -->
+  <ion-item class="ion-margin-top">
+    <ion-select label="Ordenar por nombre" labelPlacement="stacked" [(ngModel)]="criterioOrden" (ionChange)="ordenarProductos()">
+      <ion-select-option value="asc">Ascendente (A - Z)</ion-select-option>
+      <ion-select-option value="desc">Descendente (Z - A)</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <!-- Listado único de productos con botones de Editar y Eliminar -->
+  <ion-list>
+    <ion-list-header>
+      <ion-label>Productos registrados</ion-label>
+    </ion-list-header>
+
+    @for (producto of productosFiltrados; track producto.id) {
+      <ion-item>
+        <ion-label>
+          <h2>{{ producto.nombre }}</h2>
+          <p>{{ producto.descripcion || 'Sin descripción' }}</p>
+          <p>Precio: {{ producto.precio }} | Stock: {{ producto.stock }}</p>
+        </ion-label>
+
+        <ion-button
+          slot="end"
+          color="primary"
+          aria-label="Editar producto"
+          (click)="editar(producto)">
+          <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+
+        <ion-button
+          slot="end"
+          color="danger"
+          aria-label="Eliminar producto"
+          (click)="eliminar(producto)">
+          <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-item>
+    }
+  </ion-list>
+
+  <!-- Mensaje cuando no hay registros -->
+  @if (productosFiltrados.length === 0 && !error) {
+    <ion-text color="medium">
+      <p class="ion-text-center">
+        No hay productos registrados.
+      </p>
+    </ion-text>
+  }
+
+</ion-content>
